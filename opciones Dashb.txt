@@ -7,8 +7,8 @@ DEMO: https://adminlte.io/themes/v3/
 https://github.com/puikinsh/kiaalap
 DEMO: https://colorlib.com/polygon/kiaalap/index.html
 
-
-
+https://github.com/pedrodelap/architectui-html-pro
+DEMO: https://demo.dashboardpack.com/architectui-html-pro/index.html
 
 
 
@@ -16,10 +16,6 @@ DEMO: https://colorlib.com/polygon/kiaalap/index.html
 
 ---https://github.com/puikinsh/Adminator-admin-dashboard
 DEMO: https://colorlib.com/polygon/adminator/index.html
-
---https://dashboardpack.com/theme-details/architectui-html-dashboard-free/
-DEMO: https://dashboardpack.com/live-demo-free/?livedemo=329
-
 
 
 
@@ -33,5 +29,3 @@ DEMO: https://dashboardpack.com/live-demo-free/?livedemo=329
 Selected:
 *https://www.creative-tim.com/product/argon-dashboard
 DEMO: https://demos.creative-tim.com/argon-dashboard/pages/dashboard.html
-
-
