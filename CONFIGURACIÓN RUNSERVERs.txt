@@ -1,0 +1,20 @@
+CONFIGURACIÓN PROYECTO MADRE:
+<a href="http://127.0.0.1:8000/" class="btn btn-primary">Proyecto 1</a> 
+<a href="http://127.0.0.1:8001/" class="btn btn-secondary">Proyecto 2</a> 
+
+
+
+MODIFICAR PUERTO DE ACCESO PROJECTLOGS:
+cd /ruta/a/projectLogs
+python manage.py runserver 8000
+
+MODIFICAR PUERTO DE ACCESO PROJECTDASHBOARD:
+cd /ruta/a/projectDashboard
+python manage.py runserver 8001
+
+
+
+cd /ruta/a/proyectoMadre
+python manage.py runserver 8002
+
+
