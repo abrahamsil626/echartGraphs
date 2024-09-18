@@ -3,7 +3,6 @@ CONFIGURACIÓN PROYECTO MADRE:
 <a href="http://127.0.0.1:8001/" class="btn btn-secondary">Proyecto 2</a> 
 
 
-
 MODIFICAR PUERTO DE ACCESO PROJECTLOGS:
 cd /ruta/a/projectLogs
 python manage.py runserver 8000
@@ -18,3 +17,65 @@ cd /ruta/a/proyectoMadre
 python manage.py runserver 8002
 
 
+
+
+--------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------
+CONFIGURACIÓN Y CREACIÓN DE BASES DE DATOS PARA CADA PROYECTO:
+-----settings.py del proyectoDashboard:
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'baseDashboardZabb.sqlite3',
+    }
+}
+
+-----settings.py del proyectologs:
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'baseLogs.sqlite3',
+    }
+}
+
+2.-Al ejecutar las migraciones, Django creará automáticamente los archivos de base de datos:
+----cd /ruta/a/proyectoDashboard
+python manage.py migrate
+----cd /ruta/a/proyectologs
+python manage.py migrate
+
+NOTA: Después de ejecutar las migraciones, se debe ver los archivos baseDashboardZabb.sqlite3 y baseLogs.sqlite3 en las carpetas de cada proyecto.
+
+
+--------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------
+CREACIÓN DE TABLAS EN SQLITE
+Primero, debes definir tus modelos en el archivo models.py de cada proyecto. Por ejemplo:
+-----------En proyectoDashboard/models.py
+from django.db import models
+class Usuario(models.Model):
+    nombre = models.CharField(max_length=100)
+    email = models.EmailField(unique=True)
+
+    def __str__(self):
+        return self.nombre
+
+
+
+-----------En proyecto2/models.py
+from django.db import models
+class Producto(models.Model):
+    nombre = models.CharField(max_length=100)
+    precio = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return self.nombre
+
+
+
+
+Una vez definido los modelos, se necesita crear las migraciones correspondientes. Esto se hace desde la línea de comandos:
+----cd /ruta/a/rutaProyecto1--rutaProyecto2
+python manage.py makemigrations
