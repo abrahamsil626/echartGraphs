@@ -3,18 +3,18 @@ CONFIGURACIÓN PROYECTO MADRE:
 <a href="http://127.0.0.1:8001/" class="btn btn-secondary">Proyecto 2</a> 
 
 
-MODIFICAR PUERTO DE ACCESO PROJECTLOGS:
+MODIFICAR PUERTO DE ACCESO PROJECTLOGS (desde anaconda Navigator):
 cd /ruta/a/projectLogs
-python manage.py runserver 8000
-
-MODIFICAR PUERTO DE ACCESO PROJECTDASHBOARD:
-cd /ruta/a/projectDashboard
 python manage.py runserver 8001
+
+MODIFICAR PUERTO DE ACCESO PROJECTDASHBOARD (desde anaconda Navigator):
+cd /ruta/a/projectDashboard
+python manage.py runserver 8002
 
 
 
 cd /ruta/a/proyectoMadre
-python manage.py runserver 8002
+python manage.py runserver 8000
 
 
 
@@ -24,7 +24,7 @@ python manage.py runserver 8002
 --------------------------------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------------------------------
 CONFIGURACIÓN Y CREACIÓN DE BASES DE DATOS PARA CADA PROYECTO:
------settings.py del proyectoDashboard:
+-----en settings.py del proyectoDashboard:
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -32,7 +32,7 @@ DATABASES = {
     }
 }
 
------settings.py del proyectologs:
+-----en settings.py del proyectoLogs:
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
