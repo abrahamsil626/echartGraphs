@@ -1,81 +1,40 @@
-CONFIGURACIÓN PROYECTO MADRE:
-<a href="http://127.0.0.1:8000/" class="btn btn-primary">Proyecto 1</a> 
-<a href="http://127.0.0.1:8001/" class="btn btn-secondary">Proyecto 2</a> 
-
-
-MODIFICAR PUERTO DE ACCESO PROJECTLOGS (desde anaconda Navigator):
-cd /ruta/a/projectLogs
-python manage.py runserver 8001
-
-MODIFICAR PUERTO DE ACCESO PROJECTDASHBOARD (desde anaconda Navigator):
-cd /ruta/a/projectDashboard
-python manage.py runserver 8002
-
-
-
-cd /ruta/a/proyectoMadre
-python manage.py runserver 8000
-
-
-
-
 --------------------------------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------------------------------
---------------------------------------------------------------------------------------------------------------
-CONFIGURACIÓN Y CREACIÓN DE BASES DE DATOS PARA CADA PROYECTO:
------en settings.py del proyectoDashboard:
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'baseDashboardZabb.sqlite3',
-    }
-}
+REALIZAR MIGRACIÓN DE DATABASE:
 
------en settings.py del proyectoLogs:
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'baseLogs.sqlite3',
-    }
-}
+----Para que Django pueda crear las tablas en la base de datos SQLite, primero necesitas "detectar" los cambios en los modelos. Esto lo haces con el siguiente comando:
+• cd /ruta/a/rutaProyecto1--rutaProyecto2
+• python manage.py makemigrations
 
-2.-Al ejecutar las migraciones, Django creará automáticamente los archivos de base de datos:
-----cd /ruta/a/proyectoDashboard
-python manage.py migrate
-----cd /ruta/a/proyectologs
-python manage.py migrate
-
-NOTA: Después de ejecutar las migraciones, se debe ver los archivos baseDashboardZabb.sqlite3 y baseLogs.sqlite3 en las carpetas de cada proyecto.
-
+----Ahora que Django ha generado las migraciones, aplica las migraciones para crear las tablas en la base de datos SQLite:
+• python manage.py migrate
 
 --------------------------------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------------------------------
-CREACIÓN DE TABLAS EN SQLITE
-Primero, debes definir tus modelos en el archivo models.py de cada proyecto. Por ejemplo:
------------En proyectoDashboard/models.py
-from django.db import models
-class Usuario(models.Model):
-    nombre = models.CharField(max_length=100)
-    email = models.EmailField(unique=True)
 
-    def __str__(self):
-        return self.nombre
+AL REALIZAR CAMBIOS EN LAS TABLAS DE LA DATABASE:
+• Solo modificar el tipo de dato en la tabla, dentro de models.py
+• EN CLI, EN LA RUTA DEL PROYECTO: 
+    cd /ruta/a/rutaProyecto1
+• crear nueva migración:    python manage.py makemigrations
+• aplicar las migraciones:  python manage.py migrate
 
+Resumen:
+1.- Modifica los tipos de datos en tus modelos (models.py) cambiándolos a TextField para que correspondan a TEXT en SQLite.
+2.- Crea una nueva migración con python manage.py makemigrations.
+3.- Aplica la migración con python manage.py migrate para actualizar las tablas en la base de datos.
 
+--------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------
 
------------En proyecto2/models.py
-from django.db import models
-class Producto(models.Model):
-    nombre = models.CharField(max_length=100)
-    precio = models.DecimalField(max_digits=10, decimal_places=2)
-
-    def __str__(self):
-        return self.nombre
+INTEGRAR FECHAS EN GRAFANA Y CONFIGURAR QUERY PARA PONERLO EN GRAFANA: 
+• https://chatgpt.com/share/66ece552-5ad4-8006-8a15-1972ade91355
 
 
 
 
-Una vez definido los modelos, se necesita crear las migraciones correspondientes. Esto se hace desde la línea de comandos:
-----cd /ruta/a/rutaProyecto1--rutaProyecto2
-python manage.py makemigrations
+
+
+
+
