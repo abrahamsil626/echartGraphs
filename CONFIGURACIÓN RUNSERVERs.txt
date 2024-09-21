@@ -1,17 +1,6 @@
 --------------------------------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------------------------------
-REALIZAR MIGRACIÓN DE DATABASE:
-
-----Para que Django pueda crear las tablas en la base de datos SQLite, primero necesitas "detectar" los cambios en los modelos. Esto lo haces con el siguiente comando:
-• cd /ruta/a/rutaProyecto1--rutaProyecto2
-• python manage.py makemigrations
-
-----Ahora que Django ha generado las migraciones, aplica las migraciones para crear las tablas en la base de datos SQLite:
-• python manage.py migrate
-
---------------------------------------------------------------------------------------------------------------
---------------------------------------------------------------------------------------------------------------
 
 AL REALIZAR CAMBIOS EN LAS TABLAS DE LA DATABASE:
 • Solo modificar el tipo de dato en la tabla, dentro de models.py
@@ -35,6 +24,160 @@ INTEGRAR FECHAS EN GRAFANA Y CONFIGURAR QUERY PARA PONERLO EN GRAFANA:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
+BASE DE DATOS CHINOOK
+
+
+VARIABLES:
+anio
+SELECT DISTINCT strftime('%Y', invoiceDate) AS year FROM invoices ORDER BY year ASC;	
+
+mes
+01, 02, 03, 04, 05, 06, 07, 08, 09, 10, 11, 12
+
+
+---------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
+
+---BEFORE:
+SELECT i.invoiceId, i.total, i.invoiceDate 
+FROM invoices i 
+WHERE strftime('%Y', i.invoiceDate) = '${anio}';
+
+
+
+---VERSIÓN 1.0:
+SELECT i.invoiceId, i.total, i.invoiceDate 
+FROM invoices i 
+WHERE strftime('%Y', i.invoiceDate) = '${anio}'
+  AND (
+      '${mes}' LIKE '{%' OR strftime('%m', i.invoiceDate) = '${mes}'
+  );
+
+
+---DEFINITIVA:
+SELECT i.invoiceId, i.total, i.invoiceDate 
+FROM invoices i 
+WHERE (
+      ('${mes}' LIKE '{%' AND '${anio}' LIKE '{%') 
+      AND (i.invoiceDate BETWEEN '${__from:date:YYYY-MM-DD}' AND '${__to:date:YYYY-MM-DD}')
+  )
+  OR (
+      strftime('%Y', i.invoiceDate) = '${anio}' 
+      AND (
+          '${mes}' LIKE '{%' OR strftime('%m', i.invoiceDate) = '${mes}'
+      )
+  );
+
+---------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
+
+---BEFORE:
+SELECT c.firstName || ' ' || c.lastName AS CustomerName, COUNT(i.invoiceId) AS TotalInvoices, SUM(i.total) AS TotalSpent
+FROM customers c 
+INNER JOIN invoices i ON c.customerId = i.customerId 
+WHERE i.invoiceDate BETWEEN '${fecha_inicio}' AND '${fecha_fin}'
+GROUP BY CustomerName
+LIMIT 10;
+
+
+
+---VERSIÓN 1.0:
+SELECT c.firstName || ' ' || c.lastName AS CustomerName, 
+       COUNT(i.invoiceId) AS TotalInvoices, 
+       SUM(i.total) AS TotalSpent 
+FROM customers c 
+INNER JOIN invoices i ON c.customerId = i.customerId 
+WHERE strftime('%Y', i.invoiceDate) = '${anio}' 
+  AND (
+      '${mes}' LIKE '{%' 
+      OR strftime('%m', i.invoiceDate) = '${mes}'
+  )
+GROUP BY CustomerName 
+LIMIT 10;
+
+
+
+---DEFINITIVA:
+SELECT c.firstName || ' ' || c.lastName AS CustomerName, 
+       COUNT(i.invoiceId) AS TotalInvoices, 
+       SUM(i.total) AS TotalSpent 
+FROM customers c 
+INNER JOIN invoices i ON c.customerId = i.customerId 
+WHERE (
+      ('${mes}' LIKE '{%' AND '${anio}' LIKE '{%') 
+      AND (i.invoiceDate BETWEEN '${__from:date:YYYY-MM-DD}' AND '${__to:date:YYYY-MM-DD}')
+  )
+  OR (
+      strftime('%Y', i.invoiceDate) = '${anio}' 
+      AND (
+          '${mes}' LIKE '{%' OR strftime('%m', i.invoiceDate) = '${mes}'
+      )
+  )
+GROUP BY CustomerName 
+LIMIT 10;
+
+
+
+---------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
+
+---BEFORE:
+SELECT i.invoiceId, i.total, t.name AS TrackName, i.invoiceDate 
+FROM invoices i 
+INNER JOIN invoice_items ii ON i.invoiceId = ii.invoiceId 
+INNER JOIN tracks t ON ii.trackId = t.trackId 
+WHERE i.invoiceDate BETWEEN '${fecha_inicio}' AND '${fecha_fin}';
+
+
+
+
+---VERSIÓN 1.0:
+SELECT i.invoiceId, i.total, t.name AS TrackName, i.invoiceDate 
+FROM invoices i 
+INNER JOIN invoice_items ii ON i.invoiceId = ii.invoiceId 
+INNER JOIN tracks t ON ii.trackId = t.trackId 
+WHERE strftime('%Y', i.invoiceDate) = '${anio}' 
+  AND (
+      '${mes}' LIKE '{%' OR strftime('%m', i.invoiceDate) = '${mes}'
+  );
+
+
+
+---DEFINITIVA:
+SELECT i.invoiceId, i.total, t.name AS TrackName, i.invoiceDate 
+FROM invoices i 
+INNER JOIN invoice_items ii ON i.invoiceId = ii.invoiceId 
+INNER JOIN tracks t ON ii.trackId = t.trackId 
+WHERE (
+      ('${mes}' LIKE '{%' AND '${anio}' LIKE '{%') 
+      AND (i.invoiceDate BETWEEN '${__from:date:YYYY-MM-DD}' AND '${__to:date:YYYY-MM-DD}')
+  )
+  OR (
+      strftime('%Y', i.invoiceDate) = '${anio}' 
+      AND (
+          '${mes}' LIKE '{%' OR strftime('%m', i.invoiceDate) = '${mes}'
+      )
+  );
 
 
 
