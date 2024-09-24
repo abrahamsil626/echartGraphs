@@ -1,0 +1,34 @@
+Quiero crear un sistema en Python que permita filtrar datos de CSV y subir esos datos a mi base de datos local.
+
+• Las columnas de mi tabla "invoices" en mi base de datos son:
+InvoiceId
+CustomerId
+InvoiceDate
+BillingAddress
+BillingCity
+BillingState
+BillingCountry
+BillingPostalCode
+Total
+
+
+Los datos de mi CSV de invoices son, por ejemplo:
+Id=413,clar='45xd',CustomerId=2,InvoiceDate='2024-05-01 00:00:00',cam='mi',BillingAddress='Theodor-Heuss-StraÃŸe 34',City='Stuttgart',BillingState='WA',BillingCountry='Germany',BillingPostalCode='70174',Total=1.98,text='asd'
+
+De eso, yo quiero que queden así:
+Id (subir en InvoiceId)
+CustomerId (subir en CustomerId)
+InvoiceDate (subir en InvoiceDate)
+BillingAddress (subir en BillingAddress)
+City (subir en BillingCity)
+BillingState (subir en BillingState)
+BillingPostalCode (subir en BillingPostalCode)
+Total (subir en Total)
+
+quedaría algo así:
+INSERT INTO invoices (CustomerId, InvoiceDate, BillingAddress, BillingCity, BillingState, BillingCountry, BillingPostalCode, Total) VALUES 
+(2, '2024-05-01 00:00:00', 'Theodor-Heuss-StraÃŸe 34', 'Stuttgart', 'WA', 'Germany', '70174', 1.98);
+
+y subir cada registro a la tabla invoices de mi base de datos
+
+'C:\\Users\\INSPIRON 15\\Desktop\\sourceXD.csv'
