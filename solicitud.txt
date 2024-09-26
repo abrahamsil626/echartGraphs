@@ -1,3 +1,20 @@
+AUTHENTICATION_BACKENDS = [
+  'django_auth_ldap.backend.LDAPBackend',
+  'django.contrib.auth.backends.ModelBackend', # This is required for fallback
+]
+# LDAP Server Settings
+AUTH_LDAP_SERVER_URI = "ldap://10.200.0.6"
+AUTH_LDAP_BIND_DN = "CN=jsilvah,OU=Oficina de Tecnologias de la Informacion,OU=Subsecretaria General,OU=Secretaria General,OU=Usuarios,OU=DP,DC=vipdp,DC=dpperu,DC=local"
+AUTH_LDAP_BIND_PASSWORD = "your-ldap-bind-password"
+# Map LDAP attributes to Django user fields
+AUTH_LDAP_USER_ATTR_MAP = {
+  "username": "sAMAccountName",
+  "first_name": "givenName",
+  "last_name": "sn",
+  "email": "mail",
+}
+
+
 Quiero crear un sistema en Python que permita filtrar datos de CSV y subir esos datos a mi base de datos local.
 
 • Las columnas de mi tabla "invoices" en mi base de datos son:
