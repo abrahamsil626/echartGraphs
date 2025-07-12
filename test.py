@@ -1,86 +1,139 @@
-import pandas as pd
-import sqlite3
-import time
-import subprocess
+VERSION 1:
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8" /><title>Kokoro TTS Demo</title></head>
+<body>
+  <h2>Kokoro TTS Prueba</h2>
+  <textarea id="texto" rows="4" cols="50">Hola, esta es una prueba con Kokoro TTS.</textarea><br>
+  <button onclick="hablar()">Hablar</button>
+  <audio id="audio" controls></audio>
 
-def filtrar_datos_csv(file_path):
-    with open(file_path, 'r', encoding='utf-8') as file:
-        lines = file.readlines()
-
-    filtered_data = []
-
-    for line in lines:
-        line = line.strip()
-        items = line.split(',')
-
-        data = {}
-        for item in items:
-            key, value = item.split('=')
-            data[key.strip()] = value.strip().strip("'")
-
-        filtered_data.append({
-            'InvoiceId': int(data['Id']),
-            'CustomerId': int(data['CustomerId']),
-            'InvoiceDate': data['InvoiceDate'],
-            'BillingAddress': data['BillingAddress'],
-            'BillingCity': data['City'],
-            'BillingState': data['BillingState'],
-            'BillingCountry': data['BillingCountry'],
-            'BillingPostalCode': data['BillingPostalCode'],
-            'Total': float(data['Total']),
+  <script>
+    async function hablar() {
+      const texto = document.getElementById("texto").value;
+      const response = await fetch('http://localhost:8880/v1/audio/speech', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: "kokoro",
+          voice: "af_sky+af_bella",
+          input: texto
         })
+      });
 
-    df_filtrado = pd.DataFrame(filtered_data)
-    return df_filtrado
+      if (!response.ok) {
+        alert("Error: " + response.status);
+        return;
+      }
 
-def procesar_csv_y_subir(file_path, db_path):
-    df_filtrado = filtrar_datos_csv(file_path)
+      const blob = await response.blob();
+      const audio = document.getElementById("audio");
+      audio.src = URL.createObjectURL(blob);
+      audio.play();
+    }
+  </script>
+</body>
+</html>
 
-    # Detener Grafana
-    subprocess.call(['net', 'stop', 'grafana'])  # Cambiar el nombre del servicio si es necesario
 
-    # Conectar a la base de datos SQLite
-    conn = sqlite3.connect(db_path, timeout=10)  # Aumenta el tiempo de espera
-    cursor = conn.cursor()
 
-    try:
-        # Habilitar el modo WAL
-        cursor.execute("PRAGMA journal_mode=WAL;")
-        # Preparar la consulta de inserción
-        insert_query = """
-        INSERT INTO invoices (InvoiceId, CustomerId, InvoiceDate, BillingAddress, BillingCity, BillingState, BillingCountry, BillingPostalCode, Total)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """
 
-        # Insertar cada registro en la base de datos
-        for index, row in df_filtrado.iterrows():
-            while True:
-                try:
-                    cursor.execute(insert_query, (row['InvoiceId'], row['CustomerId'], row['InvoiceDate'], row['BillingAddress'], row['BillingCity'], row['BillingState'], row['BillingCountry'], row['BillingPostalCode'], row['Total']))
-                    break  # Salir del bucle si se ejecutó correctamente
-                except sqlite3.OperationalError as e:
-                    if "database is locked" in str(e):
-                        print("Base de datos bloqueada. Reintentando...")
-                        time.sleep(1)  # Esperar un segundo antes de reintentar
-                    else:
-                        raise  # Lanzar otro tipo de error
 
-        # Guardar los cambios
-        conn.commit()
-        print("Registros insertados exitosamente.")
 
-    except Exception as e:
-        print(f"Ocurrió un error inesperado: {e}")
-    finally:
-        # Cerrar la conexión
-        conn.close()
-    
-    # Reiniciar Grafana
-    subprocess.call(['net', 'start', 'grafana'])  # Cambiar el nombre del servicio si es necesario
 
-# Rutas de los archivos
-file_path = 'C:\\Users\\INSPIRON 15\\Desktop\\sourceXD.csv'  # Cambia esto a la ruta correcta de tu archivo CSV
-db_path = 'C:\\Users\\INSPIRON 15\\Desktop\\chinook.db'  # Cambia esto a la ruta correcta de tu base de datos
 
-# Procesar el CSV y subir los datos a la base de datos
-procesar_csv_y_subir(file_path, db_path)
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Grabar y Reproducir con Kokoro TTS</title>
+</head>
+<body>
+  <h2>Graba tu voz y escucha la transcripción con voz Kokoro TTS</h2>
+
+  <button id="btnGrabar">Grabar</button><br><br>
+  <p><b>Texto reconocido:</b> <span id="textoReconocido"></span></p>
+  <audio id="audio" controls></audio>
+
+  <script>
+    const btn = document.getElementById("btnGrabar");
+    const textoSpan = document.getElementById("textoReconocido");
+    const audio = document.getElementById("audio");
+
+    let recorder;
+    let chunks = [];
+
+    // Usaremos la API de Web Speech para reconocimiento
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert("Tu navegador no soporta Speech Recognition");
+    }
+    const recognition = new SpeechRecognition();
+    recognition.lang = "es-ES";
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    btn.onclick = () => {
+      textoSpan.textContent = "";
+      recognition.start();
+      btn.disabled = true;
+      btn.textContent = "Grabando...";
+    };
+
+    recognition.onresult = async (event) => {
+      const texto = event.results[0][0].transcript;
+      textoSpan.textContent = texto;
+      btn.textContent = "Grabado ✔";
+
+      // Enviar a Kokoro TTS para reproducir
+      const resp = await fetch('http://localhost:8880/v1/audio/speech', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: "kokoro",
+          voice: "af_heart",
+          input: texto
+        })
+      });
+
+      if (resp.ok) {
+        const blob = await resp.blob();
+        audio.src = URL.createObjectURL(blob);
+        audio.play();
+      } else {
+        alert("Error en TTS: " + resp.status);
+      }
+
+      btn.disabled = false;
+      btn.textContent = "Grabar";
+    };
+
+    recognition.onerror = (e) => {
+      alert("Error en reconocimiento: " + e.error);
+      btn.disabled = false;
+      btn.textContent = "Grabar";
+    };
+
+    recognition.onspeechend = () => {
+      recognition.stop();
+    };
+  </script>
+</body>
+</html>
+
+
+
+
+
+USAR DOCKER VERSION:
+docker run -p 8880:8880 --name kokoro-tts-cpu ghcr.io/remsky/kokoro-fastapi-cpu:v0.2.2
+
+
+
